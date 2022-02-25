@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 function UserItem({ user: { login, avatar_url, followers } }) {
   return (
@@ -8,7 +9,7 @@ function UserItem({ user: { login, avatar_url, followers } }) {
         <div>
           <div className="avatar">
             <div className="rounded-full shadow w-14 h-14">
-              <img src={avatar_url} alt="Profile" />
+              <LazyLoadImage src={avatar_url} alt="Profile" />
             </div>
           </div>
         </div>

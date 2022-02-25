@@ -14,6 +14,8 @@ export const GithubProvider = ({ children }) => {
     count: 10,
     start: 1,
     visitedUsers: [],
+    searchText: "",
+    page: 1,
   };
 
   const github = axios.create({
@@ -24,11 +26,13 @@ export const GithubProvider = ({ children }) => {
   const [state, dispatch] = useReducer(githubReducer, initialState);
 
   // Get search results
-  const searchUsers = async (text) => {
+  const searchUsers = async (text, page) => {
     const params = new URLSearchParams({
       q: text,
     });
-    const response = await github.get(`/search/users?${params}`);
+    const response = await github.get(
+      `/search/users?${params}&page=${page}&per_page=15`
+    );
     return response.data.items;
   };
 
@@ -42,16 +46,10 @@ export const GithubProvider = ({ children }) => {
     return { user: user.data, repos: repos.data };
   };
 
-  const fetchMore = () => {
-    const { count, start } = state;
-    state.start += state.count;
-    const res = github.get(`/users?count=${count}&start=${start}`);
-    return { users: state.users.concat(res.data) };
-  };
-
-  const createHistory = async (params, login, avatar_url) => {
+  const createHistory = (params, login, avatar_url) => {
+    state.visitedUsers = JSON.parse(localStorage.getItem("USERS"));
     if (localStorage.getItem("USERS")) {
-      state.visitedUsers = await JSON.parse(localStorage.getItem("USERS"));
+      state.visitedUsers = JSON.parse(localStorage.getItem("USERS"));
     } else {
       localStorage.setItem(
         "USERS",
@@ -59,7 +57,6 @@ export const GithubProvider = ({ children }) => {
           { avatar_url: state.user.avatar_url, login: params.login },
         ])
       );
-      state.visitedUsers = await JSON.parse(localStorage.getItem("USERS"));
     }
     if (
       state.visitedUsers.length &&
@@ -89,7 +86,6 @@ export const GithubProvider = ({ children }) => {
         getUserAndRepos,
         user: state.user,
         users: state.users,
-        fetchMore,
         count: state.count,
         createHistory,
         visitedUsers: state.visitedUsers,

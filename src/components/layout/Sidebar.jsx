@@ -5,11 +5,11 @@ import GithubContext from "../../context/github/GithubContext";
 const Sidebar = () => {
   const githubContext = useContext(GithubContext);
   const { visitedUsers } = githubContext;
-
+  console.log(visitedUsers);
   return (
     <div className="bg-white w-80 shadow-2xl rounded p-10">
-      Search History
-      {visitedUsers.map((user, index) => (
+      <h5 className="text-primary">Search History</h5>
+      {JSON.parse(localStorage.getItem("USERS"))?.map((user, index) => (
         <div key={index} className="card shadow-xl p-4">
           <div>
             <div className="avatar">
@@ -21,7 +21,7 @@ const Sidebar = () => {
           <div>
             <h2 className="card-title">{user.login}</h2>
             <Link
-              className="text-base-content text-opacity-40"
+              className="text-secondary text-opacity-40"
               to={`/user/${user.login}`}
             >
               Visit Profile

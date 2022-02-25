@@ -7,19 +7,17 @@ import RepoList from "../components/repos/RepoList";
 import GithubContext from "../context/github/GithubContext";
 
 function User() {
-  const { user, loading, repos, dispatch, getUserAndRepos, createHistory } =
+  const { user, loading, repos, dispatch, getUserAndRepos } =
     useContext(GithubContext);
 
   const params = useParams();
 
   const {
     name,
-    type,
     avatar_url,
     location,
     bio,
     blog,
-    twitter_username,
     login,
     html_url,
     followers,
@@ -37,11 +35,34 @@ function User() {
       userData = await getUserAndRepos(params.login);
       dispatch({ type: "GET_USER_AND_REPOS", payload: userData });
 
-      createHistory(params, login, avatar_url);
+      if (localStorage.getItem("USERS")) {
+        let visitedData = JSON.parse(localStorage.getItem("USERS"));
+        let findedUser = visitedData.find(
+          (data) => data.login === params.login
+        );
+        if (findedUser) {
+          visitedData = [
+            findedUser,
+            ...visitedData.filter((data) => data.login !== findedUser.login),
+          ];
+        } else {
+          visitedData = [
+            { login: params.login, avatar_url: userData.user.avatar_url },
+            ...visitedData,
+          ];
+        }
+        localStorage.setItem("USERS", JSON.stringify(visitedData));
+      } else {
+        console.log(avatar_url);
+        let visitedData = [
+          { login: params.login, avatar_url: userData.user.avatar_url },
+        ];
+        localStorage.setItem("USERS", JSON.stringify(visitedData));
+      }
     };
-    createHistory(params, login, avatar_url);
     getUserData();
-  }, [dispatch, params.login]);
+    // eslint-disable-next-line
+  }, []);
 
   if (loading) {
     return <Spinner />;
@@ -72,8 +93,7 @@ function User() {
           <div className="col-span-2">
             <div className="mb-6">
               <h1 className="text-3xl card-title">
-                {name}
-                <div className="ml-2 mr-1 badge badge-success">{type}</div>
+                {name}{" "}
                 {hireable && (
                   <div className="mx-1 badge badge-info">Hireable</div>
                 )}
@@ -108,20 +128,6 @@ function User() {
                       rel="noreferrer"
                     >
                       {blog}
-                    </a>
-                  </div>
-                </div>
-              )}
-              {twitter_username && (
-                <div className="stat">
-                  <div className="stat-title text-md">Twitter</div>
-                  <div className="text-lg stat-value">
-                    <a
-                      href={`https://twitter.com/${twitter_username}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {twitter_username}
                     </a>
                   </div>
                 </div>

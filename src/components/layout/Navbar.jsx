@@ -1,28 +1,28 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { FaGithub } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import GithubContext from "../../context/github/GithubContext";
 
 const Navbar = () => {
-  const [text, setText] = useState("");
-
-  const { dispatch, searchUsers } = useContext(GithubContext);
+  const { dispatch, searchUsers, searchText } = useContext(GithubContext);
 
   const setToast = (msg) => toast(msg);
 
-  const handleChange = (e) => setText(e.target.value);
+  const handleChange = (e) => {
+    dispatch({ type: "SEARCH_TEXT", payload: e.target.value });
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (text === "") {
+    if (searchText === "") {
       setToast("Please enter something");
     } else {
       dispatch({ type: "SET_LOADING" });
-      const users = await searchUsers(text);
+      const users = await searchUsers(searchText, 0);
       dispatch({ type: "GET_USERS", payload: users });
 
-      setText("");
+      dispatch({ type: "CHANGE_PAGE", payload: 1 });
     }
   };
   return (
@@ -42,7 +42,7 @@ const Navbar = () => {
                   type="text"
                   className="ml-auto bg-white input input-sm outline-0 text-black shadow-2xl rounded w-96"
                   placeholder="Search user..."
-                  value={text}
+                  value={searchText}
                   onChange={handleChange}
                 />
                 <button

@@ -24,6 +24,21 @@ const githubReducer = (state, action) => {
         users: [],
         loading: false,
       };
+    case "SEARCH_TEXT":
+      return {
+        ...state,
+        searchText: action.payload,
+      };
+    case "CHANGE_PAGE":
+      return {
+        ...state,
+        page: action.payload,
+      };
+    case "VISITED_PROFILE":
+      return {
+        ...state,
+        visitedUsers: action.payload,
+      };
     default:
       return state;
   }
