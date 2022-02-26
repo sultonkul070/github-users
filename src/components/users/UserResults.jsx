@@ -10,14 +10,14 @@ function UserResults() {
   const [hasMore, setHasMore] = useState(true);
   const fetchMore = async () => {
     const res = await searchUsers(searchText, page);
-    if (res.length < 15) {
+    if (res.length <= 15) {
       setHasMore(false);
+    } else {
+      dispatch({ type: "CHANGE_PAGE", payload: page + 1 });
+      dispatch({ type: "GET_USERS", payload: [...users, ...res] });
     }
-    dispatch({ type: "CHANGE_PAGE", payload: page + 1 });
-
-    dispatch({ type: "GET_USERS", payload: [...users, ...res] });
   };
-  console.log(users);
+
   return (
     <div className="grid grid-cols-1 gap-8 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-1">
       {users.length !== 0 ? (
